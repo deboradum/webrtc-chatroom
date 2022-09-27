@@ -45,7 +45,7 @@ export default function Client() {
     return (
         <>
             <div id="connect-div" className="bg-gray-700 p-5 text-white">
-                <p className="text-xl my-8">To join a session, follow these two steps!</p>
+                <p className="text-xl my-8 text-center">To join a session, follow these two steps!</p>
                 <p>2: Paste offer here:</p>
                 <button className="bg-white text-black rounded p-1 ml-5" id="get-answer-btn" onClick={createAnswer}>Get answer</button>
                 <br></br>
