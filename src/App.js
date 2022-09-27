@@ -1,9 +1,9 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import Home from "./Home";
-import Host from "./Host";
-import Client from "./Client";
+import Home from "./components/Home";
+import Host from "./components/Host";
+import Client from "./components/Client";
 
 function App() {
     return (

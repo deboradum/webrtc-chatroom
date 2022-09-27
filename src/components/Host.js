@@ -1,4 +1,6 @@
 import { useEffect } from "react";
+import SentMessage from "./SentMessage";
+import Typebox from "./Typebox";
 
 export default function Host() {
     let hostConnection
@@ -48,20 +50,35 @@ export default function Host() {
 
     return (
         <>
-            <div id="connect-div" className="bg-gray-700 h-screen p-5 text-white">
-                <p className="text-xl my-8">To host a session, follow these two steps!</p>
-                <p>1: Send the following offer to your friend:</p>
-                <button className="bg-white text-black rounded p-1 ml-5" id="get-offer-btn" onClick={createOffer}>Get offer</button>
-                <br></br>
-                <textarea id='offer-sdp' className="w-4/5 my-6 text-black p-2"></textarea>
-                <p>3: Paste answer here:</p>
-                <button className="bg-white text-black rounded p-1 ml-5" id="connect-btn" onClick={connect}>Connect</button>
-                <br></br>
-                <textarea id="answer-input" className="w-4/5 my-6 text-black p-2"></textarea>
-                <hr></hr>
-            </div>
-            <div id="message-div">
+            <div className="px-5 md:px-48 bg-gray-700 h-screen flex flex-col justify-between ">
+                <div id="connect-div" className="p-5 text-white">
+                    <p className="text-xl mb-2">To host a session, follow these two steps!</p>
+                    <p>1: Send the following offer to your friend<button className="bg-white text-black rounded p-1 ml-2" id="get-offer-btn" onClick={createOffer}>Get offer</button></p>
 
+                    <br></br>
+                    <textarea id='offer-sdp' className="w-full mb-6 text-black p-2 resize-none"></textarea>
+                    <p>3: Paste answer here<button className="bg-white text-black rounded p-1 ml-2" id="connect-btn" onClick={connect}>Connect</button></p>
+
+                    <br></br>
+                    <textarea id="answer-input" className="w-full mb-6 text-black p-2 resize-none"></textarea>
+                    <hr></hr>
+                </div>
+                <div id="message-div" className="overscroll-contain h-80 grow overflow-y-auto">
+                    <SentMessage />
+                    <SentMessage />
+                    <SentMessage />
+                    <SentMessage />
+                    <SentMessage />
+                    <SentMessage />
+                    <SentMessage />
+                    <SentMessage />
+                    <SentMessage />
+                    <SentMessage />
+                    <SentMessage />
+                    <SentMessage />
+                    <SentMessage />
+                </div>
+                <Typebox />
             </div>
         </>
     )
