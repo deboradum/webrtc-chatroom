@@ -1,4 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import SentMessage from "./SentMessage";
+import ReceivedMessage from "./ReceivedMessage";
+import Typebox from "./Typebox";
 
 export default function Client() {
     let remoteConnection;
@@ -44,19 +47,25 @@ export default function Client() {
 
     return (
         <>
-            <div id="connect-div" className="bg-gray-700 p-5 text-white">
-                <p className="text-xl my-8 text-center">To join a session, follow these two steps!</p>
-                <p>2: Paste offer here:</p>
-                <button className="bg-white text-black rounded p-1 ml-5" id="get-answer-btn" onClick={createAnswer}>Get answer</button>
-                <br></br>
-                <textarea id='offer-input' className="w-4/5 my-6 text-black p-2"></textarea>
-                <p>Send the following answer to your friend:</p>
-                <textarea id="answer-sdp" className="w-4/5 my-6 text-black p-2"></textarea>
-                <hr></hr>
-            </div>
-            <div id="message-div">
+            <div className="px-5 md:px-48 bg-gray-700 h-screen flex flex-col justify-between">
+                <div id="connect-div" className="p-5 text-white">
+                    <p className="text-xl mb-2 text-center">To join a session, follow these two steps!</p>
+                    <p>2: Paste offer here<button className="bg-white text-black rounded p-1 ml-2" id="get-answer-btn" onClick={createAnswer}>Get answer</button></p>
 
+                    <br></br>
+                    <textarea id='offer-input' className="w-full mb-6 text-black p-2 resize-none"></textarea>
+                    <p>Send the following answer to your friend:</p>
+                    <textarea disabled id="answer-sdp" className="w-full my-6 bg-white text-black p-2 resize-none"></textarea>
+                    <hr></hr>
+                </div>
+                <div id="message-div" className="overscroll-contain h-80 grow overflow-y-auto flex flex-col">
+                    <SentMessage />
+                    <ReceivedMessage />
+                </div>
+                <Typebox />
             </div>
+
+
         </>
     )
 }
