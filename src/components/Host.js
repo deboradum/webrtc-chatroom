@@ -5,16 +5,15 @@ import Typebox from "./Typebox";
 
 export default function Host() {
     const [messages, addMessage] = useState([]);
+    const [hostConnection, updateConnection] = useState(new RTCPeerConnection());
+    const [sendChan, updateSendChan] = useState(hostConnection.createDataChannel("SendChannel"))
 
-    let hostConnection;
-    let sendChan;
+    // let hostConnection;
+    // let sendChan;
     let answerInput;
     let offerSDP;
     let messageDiv;
     useEffect(() => {
-        // Sets up the client connection. This connection sends out the connection
-        // request.
-        hostConnection = new RTCPeerConnection();
         answerInput = document.getElementById("answer-input");
         offerSDP = document.getElementById("offer-sdp");
         messageDiv = document.getElementById("message-div");
@@ -40,8 +39,16 @@ export default function Host() {
     };
 
     function createOffer() {
+        // Sets up the client connection. This connection sends out the connection
+        // request.
+        // hostConnection = new RTCPeerConnection();
+
+
         // Creates a channel.
-        sendChan = hostConnection.createDataChannel("SendChannel");
+        // sendChan = hostConnection.createDataChannel("SendChannel");
+
+
+
         // Creates the offer.
         hostConnection.createOffer().then((offer) => hostConnection.setLocalDescription(offer))
 
@@ -74,9 +81,15 @@ export default function Host() {
     }
 
     function sendMessage() {
+        console.log(hostConnection)
         let sendMessageBox = document.getElementById("sendMessageBox");
         if (sendMessageBox.value) {
             sendChan.send(JSON.stringify(sendMessageBox.value));
+            let mess = {id: Math.random(),
+                type: "text",
+                content: sendMessageBox.value,
+                sOr: "sent"}
+            addMessage((oldMessages) =>[...oldMessages, mess]);
             sendMessageBox.value = "";
         }
     };

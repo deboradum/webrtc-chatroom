@@ -5,15 +5,15 @@ import Typebox from "./Typebox";
 
 export default function Client() {
     const [messages, addMessage] = useState([]);
+    const [remoteConnection, updateConnection] = useState(new RTCPeerConnection());
 
-    let remoteConnection;
-    let sendChan;
+    // let remoteConnection;
+    // let sendChan;
     let answerSDP;
     let offerInput;
     let messageDiv;
 
     useEffect(() => {
-        remoteConnection = new RTCPeerConnection();
         answerSDP = document.getElementById("answer-sdp");
         offerInput = document.getElementById("offer-input");
         messageDiv = document.getElementById("message-div");
@@ -22,10 +22,13 @@ export default function Client() {
             var state = remoteConnection.iceConnectionState
             console.log("Change: " + remoteConnection.iceConnectionState)
         };
-
         remoteConnection.ondatachannel = (message) => {
-            sendChan = message.channel;
-            sendChan.onmessage = (m) => {
+            console.log(remoteConnection)
+            // let tmp = {sendChan: "message.channel"}
+            updateConnection(oldCon => oldCon.sendChan = message.channel)
+            console.log(remoteConnection)
+            // sendChan = message.channel;
+            remoteConnection.sendChan.onmessage = (m) => {
                 let mess = {id: Math.random(),
                         type: "text",
                         content: JSON.parse(m.data),
@@ -33,11 +36,10 @@ export default function Client() {
                 addMessage((oldMessages) =>[...oldMessages, mess]);
                 messageDiv.scrollTop = messageDiv.scrollHeight;
             }
-            sendChan.onopen = (m) => {
+            remoteConnection.sendChan.onopen = (m) => {
                 console.log("connection opened from RC side.")
             }
         }
-
         remoteConnection.onicecandidate = (message) => {
             if (message.candidate) {
                 answerSDP.innerHTML = JSON.stringify(remoteConnection.localDescription)
@@ -47,6 +49,9 @@ export default function Client() {
     })
 
     function createAnswer() {
+        // remoteConnection = new RTCPeerConnection();
+
+
         const offer = new RTCSessionDescription(JSON.parse(offerInput.value));
         // Sets the offer the remote connection received from the local connection.
         remoteConnection.setRemoteDescription(offer)
@@ -55,9 +60,15 @@ export default function Client() {
     };
 
     function sendMessage() {
+        console.log(remoteConnection)
         let sendMessageBox = document.getElementById("sendMessageBox");
         if(sendMessageBox.value) {
-            sendChan.send(JSON.stringify(sendMessageBox.value));
+            remoteConnection.sendChan.send(JSON.stringify(sendMessageBox.value));
+            let mess = {id: Math.random(),
+                type: "text",
+                content: sendMessageBox.value,
+                sOr: "sent"}
+            addMessage((oldMessages) =>[...oldMessages, mess]);
             sendMessageBox.value= "";
         }
     };
