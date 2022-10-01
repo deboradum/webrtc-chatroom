@@ -1,6 +1,7 @@
 import { useState } from "react";
 import SentMessage from "./SentMessage";
 import ReceivedMessage from "./ReceivedMessage";
+import NotificationMessage from "./NotificationMessage"
 import Typebox from "./Typebox";
 import Topbar from "./Topbar"
 
@@ -42,12 +43,24 @@ export default function Host() {
         };
         let channel = hostConnection.createDataChannel("SendChannel")
 
-        channel.onopen = (message) => {
-            console.log("Connection opened from LC side.");
+        // On channel open handler.
+        channel.onopen = (m) => {
+            let mess = {id: Math.random(),
+                type: "text",
+                content: "connected! You can now chat.",
+                sOr: "notification"}
+            addMessage((oldMessages) =>[...oldMessages, mess]);
         }
-        channel.onerror = (e) => {
-            console.log(e)
+        // On channel close handler.
+        channel.onclose = (m) => {
+            let mess = {id: Math.random(),
+                type: "text",
+                content: "Connection disrupted.",
+                sOr: "notification"}
+            addMessage((oldMessages) =>[...oldMessages, mess]);
+            document.getElementById("send-btn").disabled = true;
         }
+        // Onmessage handler.
         channel.onmessage = (m) => {
             let mess = {id: Math.random(),
                     type: "text",
@@ -60,8 +73,8 @@ export default function Host() {
         updateSendChan(channel)
     };
 
+    // Sends a message through the channel.
     function sendMessage() {
-        console.log(hostConnection)
         let sendMessageBox = document.getElementById("sendMessageBox");
         if (sendMessageBox.value) {
             sendChan.send(JSON.stringify(sendMessageBox.value));
@@ -94,8 +107,10 @@ export default function Host() {
                     {messages.map((el) => {
                         if (el.sOr === "sent") {
                             return <SentMessage text={el.content} key={el.id} />
-                        } else {
+                        } else if (el.sOr === "received") {
                             return <ReceivedMessage text={el.content} key={el.id} />
+                        } else {
+                            return <NotificationMessage text={el.content} key={el.id} />
                         }
                     })}
                 </div>

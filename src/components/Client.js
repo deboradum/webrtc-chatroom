@@ -1,6 +1,7 @@
 import { useState } from "react";
 import SentMessage from "./SentMessage";
 import ReceivedMessage from "./ReceivedMessage";
+import NotificationMessage from "./NotificationMessage"
 import Typebox from "./Typebox";
 import Topbar from "./Topbar";
 
@@ -32,9 +33,22 @@ export default function Client() {
                     messageDiv.scrollTop = messageDiv.scrollHeight;
                 }
                 // On channel open handler.
-                // channel.onopen = (m) => {
-                //     console.log("connection opened from RC side.")
-                // }
+                channel.onopen = (m) => {
+                    let mess = {id: Math.random(),
+                        type: "text",
+                        content: "connected! You can now chat.",
+                        sOr: "notification"}
+                    addMessage((oldMessages) =>[...oldMessages, mess]);
+                }
+                // On channel close handler.
+                channel.onclose = (m) => {
+                    let mess = {id: Math.random(),
+                        type: "text",
+                        content: "Connection disrupted.",
+                        sOr: "notification"}
+                    addMessage((oldMessages) =>[...oldMessages, mess]);
+                    document.getElementById("send-btn").disabled = true;
+                }
 
                 // Sets the channel state.
                 updateSendChan(channel)
@@ -93,8 +107,10 @@ export default function Client() {
                     {messages.map((el) => {
                         if (el.sOr === "sent") {
                             return <SentMessage text={el.content} key={el.id} />
-                        } else {
+                        } else if (el.sOr === "received") {
                             return <ReceivedMessage text={el.content} key={el.id} />
+                        } else {
+                            return <NotificationMessage text={el.content} key={el.id} />
                         }
                     })}
                 </div>
