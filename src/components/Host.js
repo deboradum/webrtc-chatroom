@@ -48,6 +48,7 @@ export default function Host() {
             let mess = {id: Math.random(),
                 type: "text",
                 content: "connected! You can now chat.",
+                time: new Date().toLocaleTimeString(),
                 sOr: "notification"}
             addMessage((oldMessages) =>[...oldMessages, mess]);
         }
@@ -65,6 +66,7 @@ export default function Host() {
             let mess = {id: Math.random(),
                     type: "text",
                     content: JSON.parse(m.data),
+                    time: new Date().toLocaleTimeString(),
                     sOr: "received"}
             addMessage((oldMessages) =>[...oldMessages, mess]);
             messageDiv.scrollTop = messageDiv.scrollHeight;
@@ -81,6 +83,7 @@ export default function Host() {
             let mess = {id: Math.random(),
                 type: "text",
                 content: sendMessageBox.value,
+                time: new Date().toLocaleTimeString(),
                 sOr: "sent"}
             addMessage((oldMessages) =>[...oldMessages, mess]);
             sendMessageBox.value = "";
@@ -106,9 +109,9 @@ export default function Host() {
                 <div id="message-div" className="overscroll-contain h-80 grow overflow-y-auto flex flex-col">
                     {messages.map((el) => {
                         if (el.sOr === "sent") {
-                            return <SentMessage text={el.content} key={el.id} />
+                            return <SentMessage text={el.content} time={el.time} key={el.id} />
                         } else if (el.sOr === "received") {
-                            return <ReceivedMessage text={el.content} key={el.id} />
+                            return <ReceivedMessage text={el.content} time={el.time} key={el.id} />
                         } else {
                             return <NotificationMessage text={el.content} key={el.id} />
                         }
