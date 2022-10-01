@@ -7,7 +7,8 @@ import Topbar from "./Topbar"
 export default function Host() {
     const [messages, addMessage] = useState([]);
     const [hostConnection, updateConnection] = useState(new RTCPeerConnection());
-    const [sendChan, updateSendChan] = useState(hostConnection.createDataChannel("SendChannel"))
+    const [sendChan, updateSendChan] = useState(null)
+    const [test, testest] = useState(console.log("test"))
 
     // let hostConnection;
     // let sendChan;
@@ -20,7 +21,6 @@ export default function Host() {
         messageDiv = document.getElementById("message-div");
 
         hostConnection.oniceconnectionstatechange = function (e) {
-            var state = hostConnection.iceConnectionState
             console.log("Change: " + hostConnection.iceConnectionState)
         };
 
@@ -53,13 +53,15 @@ export default function Host() {
         // Creates the offer.
         hostConnection.createOffer().then((offer) => hostConnection.setLocalDescription(offer))
 
-        sendChan.onopen = (message) => {
+        let channel = hostConnection.createDataChannel("SendChannel")
+
+        channel.onopen = (message) => {
             console.log("Connection opened from LC side.");
         }
-        sendChan.onerror = (e) => {
+        channel.onerror = (e) => {
             console.log(e)
         }
-        sendChan.onmessage = (m) => {
+        channel.onmessage = (m) => {
             let mess = {id: Math.random(),
                     type: "text",
                     content: JSON.parse(m.data),
@@ -67,6 +69,8 @@ export default function Host() {
             addMessage((oldMessages) =>[...oldMessages, mess]);
             messageDiv.scrollTop = messageDiv.scrollHeight;
         }
+
+        updateSendChan(channel)
     };
 
     function sendMessage() {
