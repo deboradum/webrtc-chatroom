@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import SentMessage from "./SentMessage";
 import ReceivedMessage from "./ReceivedMessage";
 import Typebox from "./Typebox";
@@ -6,53 +6,40 @@ import Topbar from "./Topbar"
 
 export default function Host() {
     const [messages, addMessage] = useState([]);
-    const [hostConnection, updateConnection] = useState(new RTCPeerConnection());
+    const [hostConnection] = useState(new RTCPeerConnection());
     const [sendChan, updateSendChan] = useState(null)
-    const [test, testest] = useState(console.log("test"))
 
-    // let hostConnection;
-    // let sendChan;
-    let answerInput;
-    let offerSDP;
-    let messageDiv;
-    useEffect(() => {
-        answerInput = document.getElementById("answer-input");
-        offerSDP = document.getElementById("offer-sdp");
-        messageDiv = document.getElementById("message-div");
+    // Connects peers with the answer.
+    function connect() {
+        let answerInput = document.getElementById("answer-input");
+        if (answerInput.value) {
+            try {
+                let answer = new RTCSessionDescription(JSON.parse(answerInput.value));
+                hostConnection.setRemoteDescription(answer)
+            } catch {
+                answerInput.style.border="1px solid red";
+                answerInput.value = "";
+                answerInput.placeholder = "Incorrect answer SDP";
+            }
 
-        hostConnection.oniceconnectionstatechange = function (e) {
-            console.log("Change: " + hostConnection.iceConnectionState)
-        };
+            // Checken of connectie is gemaakt
+        } else {
+            answerInput.style.border="1px solid red";
+        }
+    };
 
+    function createOffer() {
+        let offerSDP = document.getElementById("offer-sdp");
+        let messageDiv = document.getElementById("message-div");
+
+        // Creates the offer.
+        hostConnection.createOffer().then((offer) => hostConnection.setLocalDescription(offer))
         hostConnection.onicecandidate = (message) => {
             if (message.candidate) {
                 offerSDP.innerHTML = JSON.stringify(hostConnection.localDescription)
                 navigator.clipboard.writeText(JSON.stringify(hostConnection.localDescription))
             }
         };
-    })
-
-    function connect() {
-        if (answerInput.value) {
-            let answer = new RTCSessionDescription(JSON.parse(answerInput.value));
-            hostConnection.setRemoteDescription(answer)
-        }
-    };
-
-    function createOffer() {
-        // Sets up the client connection. This connection sends out the connection
-        // request.
-        // hostConnection = new RTCPeerConnection();
-
-
-        // Creates a channel.
-        // sendChan = hostConnection.createDataChannel("SendChannel");
-
-
-
-        // Creates the offer.
-        hostConnection.createOffer().then((offer) => hostConnection.setLocalDescription(offer))
-
         let channel = hostConnection.createDataChannel("SendChannel")
 
         channel.onopen = (message) => {
@@ -93,11 +80,11 @@ export default function Host() {
                 <Topbar />
                 <div id="connect-div" className="p-5 text-white">
                     <p className="text-xl mb-2 text-center">To host a session, follow these two steps!</p>
-                    <p>1: Send the following offer to your friend<button className="bg-slate-100 text-black rounded p-1 ml-2" id="get-offer-btn" onClick={createOffer}>Get offer</button></p>
+                    <p>1: Send the following offer SDP to your friend.<button className="bg-slate-100 text-black rounded p-1 ml-2" id="get-offer-btn" onClick={createOffer}>Get offer</button></p>
 
                     <br></br>
                     <textarea disabled id='offer-sdp' className="w-full mb-6 h-10 bg-slate-100 text-black p-2 resize-none"></textarea>
-                    <p>3: Paste answer here<button className="bg-slate-100 text-black rounded p-1 ml-2" id="connect-btn" onClick={connect}>Connect</button></p>
+                    <p>4: Paste answer SDP here.<button className="bg-slate-100 text-black rounded p-1 ml-2" id="connect-btn" onClick={connect}>Connect</button></p>
 
                     <br></br>
                     <textarea id="answer-input" className="bg-slate-100 h-10 w-full mb-6 text-black p-2 resize-none"></textarea>
