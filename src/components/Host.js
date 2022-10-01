@@ -93,7 +93,7 @@ export default function Host() {
                     <span>1: Send the following offer SDP to your friend.<button className="bg-slate-100 text-black rounded-xl text-sm p-1 ml-2 mb-2" id="get-offer-btn" onClick={createOffer}>Get offer</button></span>
 
                     <textarea disabled id='offer-sdp' className="w-full mb-6 h-10 bg-slate-100 text-black p-2 resize-none"></textarea>
-                    <p>4: Paste answer SDP here.<button className="bg-slate-100 text-black rounded-xl text-sm p-1 text-sm ml-2 mb-2" id="connect-btn" onClick={connect}>Connect</button></p>
+                    <p>4: Paste answer SDP here.<button className="bg-slate-100 text-black rounded-xl p-1 text-sm ml-2 mb-2" id="connect-btn" onClick={connect}>Connect</button></p>
 
                     <textarea id="answer-input" className="bg-slate-100 h-10 w-full mb-6 text-black p-2 resize-none"></textarea>
                     <hr></hr>
