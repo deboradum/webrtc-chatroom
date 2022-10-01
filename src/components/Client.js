@@ -39,6 +39,7 @@ export default function Client() {
                         type: "notification"}
                     addMessage((oldMessages) =>[...oldMessages, mess]);
                     document.getElementById("disconnect-btn").classList.remove("hidden");
+                    document.getElementById("download-btn").classList.remove("hidden");
                 }
                 // On channel close handler.
                 channel.onclose = (m) => {
@@ -93,18 +94,23 @@ export default function Client() {
         remoteConnection.close();
     }
 
+    function downloadLog() {
+
+    }
+
     return (
         <>
             <div className="px-5 md:px-44 bg-gray-700 h-screen flex flex-col justify-between">
                 <Topbar />
-                <div id="connect-div" className="p-5 text-white text-center">
+                <div id="connect-div" className="py-5 text-white text-center">
                     <p className="text-xl mb-2 text-center">To join a session, follow these two steps!</p>
                     <span>2: Paste offer SDP here.<button className="bg-slate-100 text-black rounded-xl p-1 ml-2 mb-2 text-sm" id="get-answer-btn" onClick={createAnswer}>Get answer</button></span>
                     <textarea id='offer-input' className="bg-slate-100 w-full h-10 mb-6 text-black p-2 resize-none"></textarea>
 
                     <span>3: Send the following answer SDP to your friend.</span>
                     <textarea disabled id="answer-sdp" className="w-full mt-3 mb-3 h-10 bg-slate-100 text-black p-2 resize-none"></textarea>
-                    <button className="bg-slate-100 text-black rounded-xl p-1 text-sm mb-2 hidden" id="disconnect-btn" onClick={disconnect}>Disconnect</button>
+                    <button className="bg-slate-100 text-black rounded-xl p-1 text-sm mb-2 mr-1 hidden" id="disconnect-btn" onClick={disconnect}>Disconnect</button>
+                    <button className="bg-slate-100 text-black rounded-xl p-1 text-sm mb-2 ml-1 hidden" id="download-btn" onClick={downloadLog}>Download log</button>
                     <hr></hr>
                 </div>
                 <div id="message-div" className="overscroll-contain h-80 grow overflow-y-auto flex flex-col">

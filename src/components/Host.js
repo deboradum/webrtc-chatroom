@@ -49,6 +49,7 @@ export default function Host() {
                 type: "notification"}
             addMessage((oldMessages) =>[...oldMessages, mess]);
             document.getElementById("disconnect-btn").classList.remove("hidden");
+            document.getElementById("download-btn").classList.remove("hidden");
         }
         // On channel close handler.
         channel.onclose = (m) => {
@@ -89,6 +90,10 @@ export default function Host() {
         hostConnection.close();
     }
 
+    function downloadLog() {
+
+    }
+
     return (
         <>
             <div className="px-5 md:px-44 bg-gray-700 h-screen flex flex-col justify-between">
@@ -101,7 +106,8 @@ export default function Host() {
                     <p>4: Paste answer SDP here.<button className="bg-slate-100 text-black rounded-xl p-1 text-sm ml-2 mb-2" id="connect-btn" onClick={connect}>Connect</button></p>
 
                     <textarea id="answer-input" className="bg-slate-100 h-10 w-full mb-3 text-black p-2 resize-none"></textarea>
-                    <button className="bg-slate-100 text-black rounded-xl p-1 text-sm mb-2 hidden" id="disconnect-btn" onClick={disconnect}>Disconnect</button>
+                    <button className="bg-slate-100 text-black rounded-xl p-1 text-sm mb-2 mr-1 hidden" id="disconnect-btn" onClick={disconnect}>Disconnect</button>
+                    <button className="bg-slate-100 text-black rounded-xl p-1 text-sm mb-2 ml-1 hidden" id="download-btn" onClick={downloadLog}>Download log</button>
                     <hr></hr>
                 </div>
                 <div id="message-div" className="overscroll-contain h-80 grow overflow-y-auto flex flex-col">
