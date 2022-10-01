@@ -26,27 +26,24 @@ export default function Client() {
                 // Onmessage handler.
                 channel.onmessage = (m) => {
                     let mess = {id: Math.random(),
-                            type: "text",
                             content: JSON.parse(m.data),
                             time: new Date().toLocaleTimeString(),
-                            sOr: "received"}
+                            type: "received"}
                     addMessage((oldMessages) =>[...oldMessages, mess]);
                     messageDiv.scrollTop = messageDiv.scrollHeight;
                 }
                 // On channel open handler.
                 channel.onopen = (m) => {
                     let mess = {id: Math.random(),
-                        type: "text",
                         content: "connected! You can now chat.",
-                        sOr: "notification"}
+                        type: "notification"}
                     addMessage((oldMessages) =>[...oldMessages, mess]);
                 }
                 // On channel close handler.
                 channel.onclose = (m) => {
                     let mess = {id: Math.random(),
-                        type: "text",
                         content: "Connection disrupted.",
-                        sOr: "notification"}
+                        type: "notification"}
                     addMessage((oldMessages) =>[...oldMessages, mess]);
                     document.getElementById("send-btn").disabled = true;
                 }
@@ -83,10 +80,9 @@ export default function Client() {
         if(sendMessageBox.value) {
             sendChan.send(JSON.stringify(sendMessageBox.value));
             let mess = {id: Math.random(),
-                type: "text",
                 content: sendMessageBox.value,
                 time: new Date().toLocaleTimeString(),
-                sOr: "sent"}
+                type: "sent"}
             addMessage((oldMessages) =>[...oldMessages, mess]);
             sendMessageBox.value= "";
         }
@@ -98,18 +94,18 @@ export default function Client() {
                 <Topbar />
                 <div id="connect-div" className="p-5 text-white">
                     <p className="text-xl mb-2 text-center">To join a session, follow these two steps!</p>
-                    <p>2: Paste offer SDP here.<button className="bg-slate-100 text-black rounded p-1 ml-2" id="get-answer-btn" onClick={createAnswer}>Get answer</button></p>
-                    <br></br>
+                    <span>2: Paste offer SDP here.<button className="bg-slate-100 text-black rounded-xl p-1 ml-2 mb-2 text-sm" id="get-answer-btn" onClick={createAnswer}>Get answer</button></span>
                     <textarea id='offer-input' className="bg-slate-100 w-full h-10 mb-6 text-black p-2 resize-none"></textarea>
-                    <p>3: Send the following answer SDP to your friend.</p>
-                    <textarea disabled id="answer-sdp" className="w-full my-6 h-10 bg-slate-100 text-black p-2 resize-none"></textarea>
+
+                    <span>3: Send the following answer SDP to your friend.</span>
+                    <textarea disabled id="answer-sdp" className="w-full mt-3 mb-6 h-10 bg-slate-100 text-black p-2 resize-none"></textarea>
                     <hr></hr>
                 </div>
                 <div id="message-div" className="overscroll-contain h-80 grow overflow-y-auto flex flex-col">
                     {messages.map((el) => {
-                        if (el.sOr === "sent") {
+                        if (el.type === "sent") {
                             return <SentMessage text={el.content} time={el.time} key={el.id} />
-                        } else if (el.sOr === "received") {
+                        } else if (el.type === "received") {
                             return <ReceivedMessage text={el.content} time={el.time} key={el.id} />
                         } else {
                             return <NotificationMessage text={el.content} key={el.id} />

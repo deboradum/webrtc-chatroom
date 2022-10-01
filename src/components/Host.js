@@ -22,8 +22,6 @@ export default function Host() {
                 answerInput.value = "";
                 answerInput.placeholder = "Incorrect answer SDP";
             }
-
-            // Checken of connectie is gemaakt
         } else {
             answerInput.style.border="1px solid red";
         }
@@ -46,28 +44,25 @@ export default function Host() {
         // On channel open handler.
         channel.onopen = (m) => {
             let mess = {id: Math.random(),
-                type: "text",
                 content: "connected! You can now chat.",
                 time: new Date().toLocaleTimeString(),
-                sOr: "notification"}
+                type: "notification"}
             addMessage((oldMessages) =>[...oldMessages, mess]);
         }
         // On channel close handler.
         channel.onclose = (m) => {
             let mess = {id: Math.random(),
-                type: "text",
                 content: "Connection disrupted.",
-                sOr: "notification"}
+                type: "notification"}
             addMessage((oldMessages) =>[...oldMessages, mess]);
             document.getElementById("send-btn").disabled = true;
         }
         // Onmessage handler.
         channel.onmessage = (m) => {
             let mess = {id: Math.random(),
-                    type: "text",
                     content: JSON.parse(m.data),
                     time: new Date().toLocaleTimeString(),
-                    sOr: "received"}
+                    type: "received"}
             addMessage((oldMessages) =>[...oldMessages, mess]);
             messageDiv.scrollTop = messageDiv.scrollHeight;
         }
@@ -81,10 +76,9 @@ export default function Host() {
         if (sendMessageBox.value) {
             sendChan.send(JSON.stringify(sendMessageBox.value));
             let mess = {id: Math.random(),
-                type: "text",
                 content: sendMessageBox.value,
                 time: new Date().toLocaleTimeString(),
-                sOr: "sent"}
+                type: "sent"}
             addMessage((oldMessages) =>[...oldMessages, mess]);
             sendMessageBox.value = "";
         }
@@ -96,21 +90,19 @@ export default function Host() {
                 <Topbar />
                 <div id="connect-div" className="p-5 text-white">
                     <p className="text-xl mb-2 text-center">To host a session, follow these two steps!</p>
-                    <p>1: Send the following offer SDP to your friend.<button className="bg-slate-100 text-black rounded p-1 ml-2" id="get-offer-btn" onClick={createOffer}>Get offer</button></p>
+                    <span>1: Send the following offer SDP to your friend.<button className="bg-slate-100 text-black rounded-xl text-sm p-1 ml-2 mb-2" id="get-offer-btn" onClick={createOffer}>Get offer</button></span>
 
-                    <br></br>
                     <textarea disabled id='offer-sdp' className="w-full mb-6 h-10 bg-slate-100 text-black p-2 resize-none"></textarea>
-                    <p>4: Paste answer SDP here.<button className="bg-slate-100 text-black rounded p-1 ml-2" id="connect-btn" onClick={connect}>Connect</button></p>
+                    <p>4: Paste answer SDP here.<button className="bg-slate-100 text-black rounded-xl text-sm p-1 text-sm ml-2 mb-2" id="connect-btn" onClick={connect}>Connect</button></p>
 
-                    <br></br>
                     <textarea id="answer-input" className="bg-slate-100 h-10 w-full mb-6 text-black p-2 resize-none"></textarea>
                     <hr></hr>
                 </div>
                 <div id="message-div" className="overscroll-contain h-80 grow overflow-y-auto flex flex-col">
                     {messages.map((el) => {
-                        if (el.sOr === "sent") {
+                        if (el.type === "sent") {
                             return <SentMessage text={el.content} time={el.time} key={el.id} />
-                        } else if (el.sOr === "received") {
+                        } else if (el.type === "received") {
                             return <ReceivedMessage text={el.content} time={el.time} key={el.id} />
                         } else {
                             return <NotificationMessage text={el.content} key={el.id} />
