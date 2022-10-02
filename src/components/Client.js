@@ -105,7 +105,70 @@ export default function Client() {
         downloadLink.remove();
     };
 
+    // function blurScreen() {
+    //     document.getElementById("video-call-div").classList.remove("hidden");
+    //     document.getElementById("connect-div").classList.add("pointer-events-none");
+    //     document.getElementById("connect-div").classList.add("blur-sm");
+    //     document.getElementById("message-div").classList.add("pointer-events-none");
+    //     document.getElementById("message-div").classList.add("blur-sm");
+    //     document.getElementById("typebox").classList.add("pointer-events-none");
+    //     document.getElementById("typebox").classList.add("blur-sm");
+    // }
 
+    // function unBlurScreen() {
+    //     document.getElementById("video-call-div").classList.add("hidden");
+    //     document.getElementById("connect-div").classList.remove("pointer-events-none");
+    //     document.getElementById("connect-div").classList.remove("blur-sm");
+    //     document.getElementById("message-div").classList.remove("pointer-events-none");
+    //     document.getElementById("message-div").classList.remove("blur-sm");
+    //     document.getElementById("typebox").classList.remove("pointer-events-none");
+    //     document.getElementById("typebox").classList.remove("blur-sm");
+    // }
+
+    // // Starts a video call.
+    // function videoCall() {
+    //     let videoScreen = document.getElementById("videoTestSelf");
+    //     navigator.mediaDevices.getUserMedia({audio: true, video: true}).then((stream) => {
+    //         const videoTracks = stream.getVideoTracks();
+    //         stream.onremovetrack = () => {
+    //             sendMessageNotification("Video chat ended.");
+    //         };
+    //         videoScreen.srcObject = stream;
+    //         videoScreen.onloadedmetadata = () => {
+    //             videoScreen.play();
+    //         };
+
+    //         // Ontrack handler.
+    //         remoteConnection.ontrack = (message) => {
+    //             console.log("New track")
+    //         };
+
+
+    //         for (const t of videoTracks) {
+    //             remoteConnection.addTrack(t);
+    //             console.log("added track: ");
+    //             console.log(t);
+    //         }
+
+
+
+    //         blurScreen();
+    //     }).catch((error) => {
+    //         sendMessageNotification("Error starting video chat.");
+    //         });
+    // }
+
+    // function endVideoCall() {
+    //     let videoEl = document.getElementById("videoTestSelf");
+    //     let stream = videoEl.srcObject;
+    //     const tracks = stream.getTracks();
+    //     tracks.forEach((track) => {
+    //         track.stop();
+    //     });
+
+    //     videoEl.srcObject = null;
+    //     unBlurScreen();
+    // }
 
     function sendMessageNotification(text) {
         let mess = {id: Math.random(),
@@ -144,6 +207,7 @@ export default function Client() {
                     <textarea disabled id="answer-sdp" className="w-full mt-3 mb-3 h-10 bg-slate-100 text-black p-2 resize-none"></textarea>
                     <button className="bg-slate-100 text-black rounded-xl p-1 text-sm mb-2 mr-1 hidden" id="disconnect-btn" onClick={disconnect}>Disconnect</button>
                     <button className="bg-slate-100 text-black rounded-xl p-1 text-sm mb-2 ml-1 hidden" id="download-btn" onClick={downloadLog}>Download log</button>
+                    {/* <button className="bg-slate-100 text-black rounded-xl p-1 text-sm mb-2 ml-1" id="video-call-btn" onClick={videoCall}>Video call</button> */}
                     <hr></hr>
                 </div>
                 <div id="message-div" className="overscroll-contain h-80 grow overflow-y-auto flex flex-col">
@@ -158,6 +222,12 @@ export default function Client() {
                     })}
                 </div>
                 <Typebox sendMessage={sendMessage} />
+
+                {/* <div id="video-call-div" className="hidden">
+                    <video id="videoTestOther" className="absolute w-96 h-96 left-32 top-16"></video>
+                    <video id="videoTestSelf" className="absolute w-96 h-96 right-32 top-16"></video>
+                    <button className="absolute rounded-2xl p-2 font-bold bg-red-600 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" onClick={endVideoCall}>Stop video call</button>
+                </div> */}
             </div>
 
 

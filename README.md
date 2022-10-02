@@ -1,9 +1,9 @@
 # WebRTC Chatroom
 
-To learn more about WebRTC and React, I created a WebRTC chatroom using the WebRTC API.
+To learn more about WebRTC and React, I created a WebRTC chatroom using purely the WebRTC API without socket.io.
 
 # todo
 file transfer\
 video chat\
-make & send images\
 auto scroll down on new messages\
+Custom add stunserver functionality
