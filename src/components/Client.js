@@ -25,30 +25,18 @@ export default function Client() {
                 let channel = message.channel;
                 // Onmessage handler.
                 channel.onmessage = (m) => {
-                    let mess = {id: Math.random(),
-                                type: "received",
-                                time: new Date().toLocaleTimeString(),
-                                content: JSON.parse(m.data)};
-                    addMessage((oldMessages) =>[...oldMessages, mess]);
+                    sendMessageReceived(JSON.parse(m.data));
                     messageDiv.scrollTop = messageDiv.scrollHeight;
                 };
                 // On channel open handler.
                 channel.onopen = (m) => {
-                    let mess = {id: Math.random(),
-                                type: "notification",
-                                time: new Date().toLocaleTimeString(),
-                                content: "connected! You can now chat."};
-                    addMessage((oldMessages) =>[...oldMessages, mess]);
+                    sendMessageNotification("connected! You can now chat.");
                     document.getElementById("disconnect-btn").classList.remove("hidden");
                     document.getElementById("download-btn").classList.remove("hidden");
                 };
                 // On channel close handler.
                 channel.onclose = (m) => {
-                    let mess = {id: Math.random(),
-                                type: "notification",
-                                time: new Date().toLocaleTimeString(),
-                                content: "Connection disrupted."};
-                    addMessage((oldMessages) =>[...oldMessages, mess]);
+                    sendMessageNotification("Disconnected.");
                     document.getElementById("send-btn").disabled = true;
                 };
 
@@ -83,11 +71,7 @@ export default function Client() {
         let sendMessageBox = document.getElementById("sendMessageBox");
         if(sendMessageBox.value) {
             sendChan.send(JSON.stringify(sendMessageBox.value));
-            let mess = {id: Math.random(),
-                        type: "sent",
-                        time: new Date().toLocaleTimeString(),
-                        content: sendMessageBox.value};
-            addMessage((oldMessages) =>[...oldMessages, mess]);
+            sendMessageSent(sendMessageBox.value);
             sendMessageBox.value= "";
         }
     };
@@ -120,6 +104,32 @@ export default function Client() {
         URL.revokeObjectURL(href);
         downloadLink.remove();
     };
+
+
+
+    function sendMessageNotification(text) {
+        let mess = {id: Math.random(),
+            type: "notification",
+            time: new Date().toLocaleTimeString(),
+            content: text};
+        addMessage((oldMessages) =>[...oldMessages, mess]);
+    }
+
+    function sendMessageSent(text) {
+        let mess = {id: Math.random(),
+            type: "sent",
+            time: new Date().toLocaleTimeString(),
+            content: text};
+        addMessage((oldMessages) =>[...oldMessages, mess]);
+    }
+
+    function sendMessageReceived(text) {
+        let mess = {id: Math.random(),
+            type: "received",
+            time: new Date().toLocaleTimeString(),
+            content: text};
+        addMessage((oldMessages) =>[...oldMessages, mess]);
+    }
 
     return (
         <>

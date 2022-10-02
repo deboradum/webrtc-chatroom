@@ -43,30 +43,19 @@ export default function Host() {
 
         // On channel open handler.
         channel.onopen = (m) => {
-            let mess = {id: Math.random(),
-                        type: "notification",
-                        time: new Date().toLocaleTimeString(),
-                        content: "connected! You can now chat."};
-            addMessage((oldMessages) =>[...oldMessages, mess]);
+            sendMessageNotification("connected! You can now chat.");
             document.getElementById("disconnect-btn").classList.remove("hidden");
             document.getElementById("download-btn").classList.remove("hidden");
+            document.getElementById("video-call-btn").classList.remove("hidden");
         };
         // On channel close handler.
         channel.onclose = (m) => {
-            let mess = {id: Math.random(),
-                        type: "notification",
-                        time: new Date().toLocaleTimeString(),
-                        content: "Connection disrupted."};
-            addMessage((oldMessages) =>[...oldMessages, mess]);
+            sendMessageNotification("Disconnected.");
             document.getElementById("send-btn").disabled = true;
         };
         // Onmessage handler.
         channel.onmessage = (m) => {
-            let mess = {id: Math.random(),
-                        type: "received",
-                        time: new Date().toLocaleTimeString(),
-                        content: JSON.parse(m.data)};
-            addMessage((oldMessages) =>[...oldMessages, mess]);
+            sendMessageReceived(JSON.parse(m.data));
             messageDiv.scrollTop = messageDiv.scrollHeight;
         };
 
@@ -78,11 +67,7 @@ export default function Host() {
         let sendMessageBox = document.getElementById("sendMessageBox");
         if (sendMessageBox.value) {
             sendChan.send(JSON.stringify(sendMessageBox.value));
-            let mess = {id: Math.random(),
-                        type: "sent",
-                        time: new Date().toLocaleTimeString(),
-                        content: sendMessageBox.value};
-            addMessage((oldMessages) =>[...oldMessages, mess]);
+            sendMessageSent(sendMessageBox.value);
             sendMessageBox.value = "";
         }
     };
@@ -116,6 +101,81 @@ export default function Host() {
         downloadLink.remove();
     };
 
+    function blurScreen() {
+        document.getElementById("video-call-div").classList.remove("hidden");
+            document.getElementById("connect-div").classList.add("pointer-events-none");
+            document.getElementById("connect-div").classList.add("blur-sm");
+            document.getElementById("connect-div").classList.add("pointer-events-none");
+            document.getElementById("connect-div").classList.add("blur-sm");
+            document.getElementById("typebox").classList.add("pointer-events-none");
+            document.getElementById("typebox").classList.add("blur-sm");
+    }
+
+    function unBlurScreen() {
+        document.getElementById("video-call-div").classList.add("hidden");
+            document.getElementById("connect-div").classList.remove("pointer-events-none");
+            document.getElementById("connect-div").classList.remove("blur-sm");
+            document.getElementById("connect-div").classList.remove("pointer-events-none");
+            document.getElementById("connect-div").classList.remove("blur-sm");
+            document.getElementById("typebox").classList.remove("pointer-events-none");
+            document.getElementById("typebox").classList.remove("blur-sm");
+    }
+
+    // Starts a video call.
+    function videoCall() {
+        let videoScreen = document.getElementById("videoTestTwo");
+        navigator.mediaDevices.getUserMedia({audio: false, video: true}).then((stream) => {
+            const videoTracks = stream.getVideoTracks();
+            stream.onremovetrack = () => {
+                sendMessageNotification("Video chat ended.");
+            };
+            videoScreen.srcObject = stream;
+            videoScreen.onloadedmetadata = () => {
+                videoScreen.play();
+            };
+            blurScreen();
+
+        }).catch((error) => {
+            sendMessageNotification("Error starting video chat.");
+            });
+    }
+
+    function endVideoCall() {
+        let videoEl = document.getElementById("videoTestTwo");
+        let stream = videoEl.srcObject;
+        const tracks = stream.getTracks();
+        tracks.forEach((track) => {
+            track.stop();
+        });
+
+        videoEl.srcObject = null;
+        unBlurScreen();
+    }
+
+    function sendMessageNotification(text) {
+        let mess = {id: Math.random(),
+            type: "notification",
+            time: new Date().toLocaleTimeString(),
+            content: text};
+        addMessage((oldMessages) =>[...oldMessages, mess]);
+    }
+
+    function sendMessageSent(text) {
+        let mess = {id: Math.random(),
+            type: "sent",
+            time: new Date().toLocaleTimeString(),
+            content: text};
+        addMessage((oldMessages) =>[...oldMessages, mess]);
+    }
+
+    function sendMessageReceived(text) {
+        let mess = {id: Math.random(),
+            type: "received",
+            time: new Date().toLocaleTimeString(),
+            content: text};
+        addMessage((oldMessages) =>[...oldMessages, mess]);
+    }
+
     return (
         <>
             <div className="px-5 md:px-44 bg-gray-700 h-screen flex flex-col justify-between">
@@ -130,8 +190,10 @@ export default function Host() {
                     <textarea id="answer-input" className="bg-slate-100 h-10 w-full mb-3 text-black p-2 resize-none"></textarea>
                     <button className="bg-slate-100 text-black rounded-xl p-1 text-sm mb-2 mr-1 hidden" id="disconnect-btn" onClick={disconnect}>Disconnect</button>
                     <button className="bg-slate-100 text-black rounded-xl p-1 text-sm mb-2 ml-1 hidden" id="download-btn" onClick={downloadLog}>Download log</button>
+                    <button className="bg-slate-100 text-black rounded-xl p-1 text-sm mb-2 ml-1" id="video-call-btn" onClick={videoCall}>Video call</button>
                     <hr></hr>
                 </div>
+
                 <div id="message-div" className="overscroll-contain h-80 grow overflow-y-auto flex flex-col">
                     {messages.map((el) => {
                         if (el.type === "sent") {
@@ -144,7 +206,14 @@ export default function Host() {
                     })}
                 </div>
                 <Typebox sendMessage={sendMessage} />
+
+                <div id="video-call-div" className="hidden">
+                    <video id="videoTest" className="absolute w-96 h-96 left-32 top-16"></video>
+                    <video id="videoTestTwo" className="absolute w-96 h-96 right-32 top-16"></video>
+                    <button className="absolute rounded-2xl p-2 font-bold bg-red-600 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" onClick={endVideoCall}>Stop video call</button>
+                </div>
             </div>
+
         </>
     )
 }
