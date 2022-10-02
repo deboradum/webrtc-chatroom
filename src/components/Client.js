@@ -26,17 +26,18 @@ export default function Client() {
                 // Onmessage handler.
                 channel.onmessage = (m) => {
                     let mess = {id: Math.random(),
-                            content: JSON.parse(m.data),
-                            time: new Date().toLocaleTimeString(),
-                            type: "received"}
+                                type: "received",
+                                time: new Date().toLocaleTimeString(),
+                                content: JSON.parse(m.data)};
                     addMessage((oldMessages) =>[...oldMessages, mess]);
                     messageDiv.scrollTop = messageDiv.scrollHeight;
                 };
                 // On channel open handler.
                 channel.onopen = (m) => {
                     let mess = {id: Math.random(),
-                        content: "connected! You can now chat.",
-                        type: "notification"}
+                                type: "notification",
+                                time: new Date().toLocaleTimeString(),
+                                content: "connected! You can now chat."};
                     addMessage((oldMessages) =>[...oldMessages, mess]);
                     document.getElementById("disconnect-btn").classList.remove("hidden");
                     document.getElementById("download-btn").classList.remove("hidden");
@@ -44,9 +45,9 @@ export default function Client() {
                 // On channel close handler.
                 channel.onclose = (m) => {
                     let mess = {id: Math.random(),
-                        content: "Connection disrupted.",
-                        time: new Date().toLocaleTimeString(),
-                        type: "notification"}
+                                type: "notification",
+                                time: new Date().toLocaleTimeString(),
+                                content: "Connection disrupted."};
                     addMessage((oldMessages) =>[...oldMessages, mess]);
                     document.getElementById("send-btn").disabled = true;
                 };
@@ -83,21 +84,42 @@ export default function Client() {
         if(sendMessageBox.value) {
             sendChan.send(JSON.stringify(sendMessageBox.value));
             let mess = {id: Math.random(),
-                content: sendMessageBox.value,
-                time: new Date().toLocaleTimeString(),
-                type: "sent"};
+                        type: "sent",
+                        time: new Date().toLocaleTimeString(),
+                        content: sendMessageBox.value};
             addMessage((oldMessages) =>[...oldMessages, mess]);
             sendMessageBox.value= "";
         }
     };
 
+    // Disconnects from the channel.
     function disconnect() {
         remoteConnection.close();
     }
 
+    // Downloads all messages in a .txt file.
     function downloadLog() {
+        let text = "";
+        let messageLog = [...messages];
+        messageLog.map(el => {
+            text = text.concat("{Type: " + el.type);
+            text = text.concat("; Time: " + el.time);
+            text = text.concat("; Content: " + el.content + "}\n");
+            return null;
+        });
 
-    }
+        const blob = new Blob([text], { type: 'text/plain' });
+        let href = URL.createObjectURL(blob);
+
+        const downloadLink = Object.assign(document.createElement("a"), {
+            href,
+            style:"display:none",
+            download:"webRTC-ChatLog.txt"});
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        URL.revokeObjectURL(href);
+        downloadLink.remove();
+    };
 
     return (
         <>

@@ -7,4 +7,3 @@ file transfer\
 video chat\
 make & send images\
 auto scroll down on new messages\
-download chatlogs\
