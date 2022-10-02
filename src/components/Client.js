@@ -1,7 +1,8 @@
 import { useState } from "react";
 import SentMessage from "./SentMessage";
 import ReceivedMessage from "./ReceivedMessage";
-import NotificationMessage from "./NotificationMessage"
+import NotificationMessage from "./NotificationMessage";
+import FileMessage from "./FileMessage";
 import Typebox from "./Typebox";
 import Topbar from "./Topbar";
 
@@ -25,18 +26,26 @@ export default function Client() {
                 let channel = message.channel;
                 // Onmessage handler.
                 channel.onmessage = (m) => {
-                    sendMessageReceived(JSON.parse(m.data));
-                    messageDiv.scrollTop = messageDiv.scrollHeight;
+                    if (m.data instanceof Blob) {
+                        let mess = {id: Math.random(),
+                            type: "file",
+                            time: new Date().toLocaleTimeString(),
+                            file: m.data};
+                        addMessage((oldMessages) =>[...oldMessages, mess]);
+                    } else {
+                        addMessageReceived(m.data);
+                        messageDiv.scrollTop = messageDiv.scrollHeight;
+                    }
                 };
                 // On channel open handler.
                 channel.onopen = (m) => {
-                    sendMessageNotification("connected! You can now chat.");
+                    addMessageNotification("connected! You can now chat.");
                     document.getElementById("disconnect-btn").classList.remove("hidden");
                     document.getElementById("download-btn").classList.remove("hidden");
                 };
                 // On channel close handler.
                 channel.onclose = (m) => {
-                    sendMessageNotification("Disconnected.");
+                    addMessageNotification("Disconnected.");
                     document.getElementById("send-btn").disabled = true;
                 };
 
@@ -47,7 +56,6 @@ export default function Client() {
             remoteConnection.onicecandidate = (message) => {
                 if (message.candidate) {
                     answerSDP.innerHTML = JSON.stringify(remoteConnection.localDescription);
-                    navigator.clipboard.writeText(JSON.stringify(remoteConnection.localDescription));
                 }
             };
 
@@ -70,8 +78,8 @@ export default function Client() {
     function sendMessage() {
         let sendMessageBox = document.getElementById("sendMessageBox");
         if(sendMessageBox.value) {
-            sendChan.send(JSON.stringify(sendMessageBox.value));
-            sendMessageSent(sendMessageBox.value);
+            sendChan.send(sendMessageBox.value);
+            addMessageSent(sendMessageBox.value);
             sendMessageBox.value= "";
         }
     };
@@ -131,7 +139,7 @@ export default function Client() {
     //     navigator.mediaDevices.getUserMedia({audio: true, video: true}).then((stream) => {
     //         const videoTracks = stream.getVideoTracks();
     //         stream.onremovetrack = () => {
-    //             sendMessageNotification("Video chat ended.");
+    //             addMessageNotification("Video chat ended.");
     //         };
     //         videoScreen.srcObject = stream;
     //         videoScreen.onloadedmetadata = () => {
@@ -154,7 +162,7 @@ export default function Client() {
 
     //         blurScreen();
     //     }).catch((error) => {
-    //         sendMessageNotification("Error starting video chat.");
+    //         addMessageNotification("Error starting video chat.");
     //         });
     // }
 
@@ -170,7 +178,7 @@ export default function Client() {
     //     unBlurScreen();
     // }
 
-    function sendMessageNotification(text) {
+    function addMessageNotification(text) {
         let mess = {id: Math.random(),
             type: "notification",
             time: new Date().toLocaleTimeString(),
@@ -178,7 +186,7 @@ export default function Client() {
         addMessage((oldMessages) =>[...oldMessages, mess]);
     }
 
-    function sendMessageSent(text) {
+    function addMessageSent(text) {
         let mess = {id: Math.random(),
             type: "sent",
             time: new Date().toLocaleTimeString(),
@@ -186,12 +194,28 @@ export default function Client() {
         addMessage((oldMessages) =>[...oldMessages, mess]);
     }
 
-    function sendMessageReceived(text) {
+    function addMessageReceived(text) {
         let mess = {id: Math.random(),
             type: "received",
             time: new Date().toLocaleTimeString(),
             content: text};
         addMessage((oldMessages) =>[...oldMessages, mess]);
+    }
+
+    function sendFile() {
+        const uploadFile = Object.assign(document.createElement("input"), {
+            type: "file",
+            style:"display:none"
+        });
+        uploadFile.addEventListener("change", (e) => {
+            let file = e.target.files[0];
+            if (file) {
+                sendChan.send(file);
+                sendChan.send(file.name);
+                addMessageSent("You sent a file.");
+            }
+        })
+        uploadFile.click();
     }
 
     return (
@@ -216,12 +240,14 @@ export default function Client() {
                             return <SentMessage text={el.content} time={el.time} key={el.id} />
                         } else if (el.type === "received") {
                             return <ReceivedMessage text={el.content} time={el.time} key={el.id} />
+                        } else if (el.type === "file") {
+                            return <FileMessage blob={el.file} time={el.time} key={el.id} />
                         } else {
                             return <NotificationMessage text={el.content} key={el.id} />
                         }
                     })}
                 </div>
-                <Typebox sendMessage={sendMessage} />
+                <Typebox sendMessage={sendMessage} sendFile={sendFile} />
 
                 {/* <div id="video-call-div" className="hidden">
                     <video id="videoTestOther" className="absolute w-96 h-96 left-32 top-16"></video>
