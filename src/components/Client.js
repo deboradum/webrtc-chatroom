@@ -8,7 +8,7 @@ import Topbar from "./Topbar";
 export default function Client() {
     const [messages, addMessage] = useState([]);
     const [remoteConnection] = useState(new RTCPeerConnection());
-    const [sendChan, updateSendChan] = useState(null)
+    const [sendChan, updateSendChan] = useState(null);
 
     // Nog buttons disablen
     function createAnswer() {
@@ -31,7 +31,7 @@ export default function Client() {
                             type: "received"}
                     addMessage((oldMessages) =>[...oldMessages, mess]);
                     messageDiv.scrollTop = messageDiv.scrollHeight;
-                }
+                };
                 // On channel open handler.
                 channel.onopen = (m) => {
                     let mess = {id: Math.random(),
@@ -40,34 +40,35 @@ export default function Client() {
                     addMessage((oldMessages) =>[...oldMessages, mess]);
                     document.getElementById("disconnect-btn").classList.remove("hidden");
                     document.getElementById("download-btn").classList.remove("hidden");
-                }
+                };
                 // On channel close handler.
                 channel.onclose = (m) => {
                     let mess = {id: Math.random(),
                         content: "Connection disrupted.",
+                        time: new Date().toLocaleTimeString(),
                         type: "notification"}
                     addMessage((oldMessages) =>[...oldMessages, mess]);
                     document.getElementById("send-btn").disabled = true;
-                }
+                };
 
                 // Sets the channel state.
-                updateSendChan(channel)
-            }
+                updateSendChan(channel);
+            };
             // Onicecandidate handler.
             remoteConnection.onicecandidate = (message) => {
                 if (message.candidate) {
-                    answerSDP.innerHTML = JSON.stringify(remoteConnection.localDescription)
-                    navigator.clipboard.writeText(JSON.stringify(remoteConnection.localDescription))
+                    answerSDP.innerHTML = JSON.stringify(remoteConnection.localDescription);
+                    navigator.clipboard.writeText(JSON.stringify(remoteConnection.localDescription));
                 }
-            }
+            };
 
             let offer;
             try {
                 offer = new RTCSessionDescription(JSON.parse(offerInput.value));
                 // Sets the offer the remote connection received from the local connection.
-                remoteConnection.setRemoteDescription(offer)
+                remoteConnection.setRemoteDescription(offer);
                 // Creates an answer to the offer it got from the local connection.
-                remoteConnection.createAnswer().then((answer) => remoteConnection.setLocalDescription(answer))
+                remoteConnection.createAnswer().then((answer) => remoteConnection.setLocalDescription(answer));
             } catch {
                 offerInput.style.border="1px solid red";
                 offerInput.value = "";
@@ -84,7 +85,7 @@ export default function Client() {
             let mess = {id: Math.random(),
                 content: sendMessageBox.value,
                 time: new Date().toLocaleTimeString(),
-                type: "sent"}
+                type: "sent"};
             addMessage((oldMessages) =>[...oldMessages, mess]);
             sendMessageBox.value= "";
         }

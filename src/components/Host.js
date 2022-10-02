@@ -8,7 +8,7 @@ import Topbar from "./Topbar"
 export default function Host() {
     const [messages, addMessage] = useState([]);
     const [hostConnection] = useState(new RTCPeerConnection());
-    const [sendChan, updateSendChan] = useState(null)
+    const [sendChan, updateSendChan] = useState(null);
 
     // Connects peers with the answer.
     function connect() {
@@ -16,7 +16,7 @@ export default function Host() {
         if (answerInput.value) {
             try {
                 let answer = new RTCSessionDescription(JSON.parse(answerInput.value));
-                hostConnection.setRemoteDescription(answer)
+                hostConnection.setRemoteDescription(answer);
             } catch {
                 answerInput.style.border="1px solid red";
                 answerInput.value = "";
@@ -32,21 +32,21 @@ export default function Host() {
         let messageDiv = document.getElementById("message-div");
 
         // Creates the offer.
-        hostConnection.createOffer().then((offer) => hostConnection.setLocalDescription(offer))
+        hostConnection.createOffer().then((offer) => hostConnection.setLocalDescription(offer));
         hostConnection.onicecandidate = (message) => {
             if (message.candidate) {
-                offerSDP.innerHTML = JSON.stringify(hostConnection.localDescription)
-                navigator.clipboard.writeText(JSON.stringify(hostConnection.localDescription))
+                offerSDP.innerHTML = JSON.stringify(hostConnection.localDescription);
+                navigator.clipboard.writeText(JSON.stringify(hostConnection.localDescription));
             }
         };
-        let channel = hostConnection.createDataChannel("SendChannel")
+        let channel = hostConnection.createDataChannel("SendChannel");
 
         // On channel open handler.
         channel.onopen = (m) => {
             let mess = {id: Math.random(),
                 content: "connected! You can now chat.",
                 time: new Date().toLocaleTimeString(),
-                type: "notification"}
+                type: "notification"};
             addMessage((oldMessages) =>[...oldMessages, mess]);
             document.getElementById("disconnect-btn").classList.remove("hidden");
             document.getElementById("download-btn").classList.remove("hidden");
@@ -55,7 +55,8 @@ export default function Host() {
         channel.onclose = (m) => {
             let mess = {id: Math.random(),
                 content: "Connection disrupted.",
-                type: "notification"}
+                time: new Date().toLocaleTimeString(),
+                type: "notification"};
             addMessage((oldMessages) =>[...oldMessages, mess]);
             document.getElementById("send-btn").disabled = true;
         }
@@ -64,12 +65,12 @@ export default function Host() {
             let mess = {id: Math.random(),
                     content: JSON.parse(m.data),
                     time: new Date().toLocaleTimeString(),
-                    type: "received"}
+                    type: "received"};
             addMessage((oldMessages) =>[...oldMessages, mess]);
             messageDiv.scrollTop = messageDiv.scrollHeight;
         }
 
-        updateSendChan(channel)
+        updateSendChan(channel);
     };
 
     // Sends a message through the channel.
@@ -80,7 +81,7 @@ export default function Host() {
             let mess = {id: Math.random(),
                 content: sendMessageBox.value,
                 time: new Date().toLocaleTimeString(),
-                type: "sent"}
+                type: "sent"};
             addMessage((oldMessages) =>[...oldMessages, mess]);
             sendMessageBox.value = "";
         }
