@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SentMessage from "./SentMessage";
 import ReceivedMessage from "./ReceivedMessage";
 import NotificationMessage from "./NotificationMessage";
@@ -10,6 +10,12 @@ export default function Client() {
     const [messages, addMessage] = useState([]);
     const [remoteConnection] = useState(new RTCPeerConnection());
     const [sendChan, updateSendChan] = useState(null);
+
+    // Scrolls down the message div automatically each render.
+    useEffect(() => {
+        let messageDiv = document.getElementById("message-div");
+        messageDiv.scrollTop = messageDiv.scrollHeight;
+    })
 
     // Nog buttons disablen
     function createAnswer() {
@@ -76,12 +82,14 @@ export default function Client() {
 
     // Sends a message through the channel.
     function sendMessage() {
+        let messageDiv = document.getElementById("message-div");
         let sendMessageBox = document.getElementById("sendMessageBox");
         if(sendMessageBox.value) {
             sendChan.send(sendMessageBox.value);
             addMessageSent(sendMessageBox.value);
             sendMessageBox.value= "";
         }
+        messageDiv.scrollTop = messageDiv.scrollHeight;
     };
 
     // Disconnects from the channel.

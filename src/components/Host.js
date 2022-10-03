@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SentMessage from "./SentMessage";
 import ReceivedMessage from "./ReceivedMessage";
 import NotificationMessage from "./NotificationMessage";
@@ -10,6 +10,12 @@ export default function Host() {
     const [messages, addMessage] = useState([]);
     const [hostConnection] = useState(new RTCPeerConnection());
     const [sendChan, updateSendChan] = useState(null);
+
+    // Scrolls down the message div automatically each render.
+    useEffect(() => {
+        let messageDiv = document.getElementById("message-div");
+        messageDiv.scrollTop = messageDiv.scrollHeight;
+    })
 
     // Connects peers with the answer.
     function connect() {
@@ -30,7 +36,6 @@ export default function Host() {
 
     function createOffer() {
         let offerSDP = document.getElementById("offer-sdp");
-        let messageDiv = document.getElementById("message-div");
 
         // Creates the offer.
         hostConnection.createOffer().then((offer) => hostConnection.setLocalDescription(offer));
@@ -63,7 +68,6 @@ export default function Host() {
                 addMessage((oldMessages) =>[...oldMessages, mess]);
             } else {
                 addMessageReceived(m.data);
-                messageDiv.scrollTop = messageDiv.scrollHeight;
             }
         };
 
