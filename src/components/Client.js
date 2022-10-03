@@ -218,12 +218,17 @@ export default function Client() {
         uploadFile.click();
     }
 
+    function toggleConnectDiv() {
+        document.getElementById("connect-div").classList.toggle("hidden");
+    }
+
     return (
         <>
             <div className="px-5 md:px-44 bg-gray-700 h-screen flex flex-col justify-between">
                 <Topbar />
+                <p className="text-xl mb-2 text-center hover:cursor-pointer" onClick={toggleConnectDiv}>To join a session, follow these two steps!</p>
                 <div id="connect-div" className="py-5 text-white text-center">
-                    <p className="text-xl mb-2 text-center">To join a session, follow these two steps!</p>
+
                     <span>2: Paste offer SDP here.<button className="bg-slate-100 text-black rounded-xl p-1 ml-2 mb-2 text-sm" id="get-answer-btn" onClick={createAnswer}>Get answer</button></span>
                     <textarea id='offer-input' className="bg-slate-100 w-full h-10 mb-6 text-black p-2 resize-none"></textarea>
 
