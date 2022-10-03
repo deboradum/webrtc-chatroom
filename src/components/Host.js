@@ -204,8 +204,8 @@ export default function Host() {
         uploadFile.addEventListener("change", (e) => {
             let file = e.target.files[0];
             if (file) {
-                sendChan.send(file);
                 sendChan.send(file.name);
+                sendChan.send(file);
                 addMessageSent("You sent a file.");
             }
         })
@@ -237,7 +237,7 @@ export default function Host() {
                         } else if (el.type === "received") {
                             return <ReceivedMessage text={el.content} time={el.time} key={el.id} />
                         } else if (el.type === "file") {
-                            return <FileMessage blob={el.file} time={el.time} key={el.id} />
+                            return <FileMessage blob={el.file} time={el.time} fileNameExt={messages.at(-2).content} key={el.id} />
                         } else {
                             return <NotificationMessage text={el.content} key={el.id} />
                         }

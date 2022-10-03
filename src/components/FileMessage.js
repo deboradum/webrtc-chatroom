@@ -1,9 +1,13 @@
-function FileMessage({ blob, time }) {
-    function saveToDisk(fileUrl, fileName) {
+function FileMessage({ blob, time, fileNameExt }) {
+    function saveToDisk(fileUrl) {
         var save = document.createElement('a');
         save.href = fileUrl;
         save.target = '_blank';
-        save.download = fileName || fileUrl;
+        if (fileNameExt) {
+            save.download = fileNameExt || fileUrl;
+        } else {
+            save.download = "file" || fileUrl;
+        }
         save.click();
         (window.URL || window.webkitURL).revokeObjectURL(save.href);
     }
